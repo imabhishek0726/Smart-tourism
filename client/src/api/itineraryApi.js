@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // In dev, Vite proxies /api -> http://localhost:5000 (see vite.config.js).
-const client = axios.create({ baseURL: "/api" });
+const client = axios.create({ baseURL: import.meta.env.VITE_API_URL, });
 
 export async function generateItinerary({ destination, days, people, budget, interests }) {
   const { data } = await client.post("/itinerary/generate", {
