@@ -62,7 +62,11 @@ export async function fetchWeather(destination, days = 3) {
 
     return { source: "live", forecast };
   } catch (err) {
-    console.warn("[weatherService] Falling back to mock data:", err.message);
+     console.error(
+    "[weatherService] OpenWeather failed:",
+    err.response?.status,
+    err.response?.data || err.message
+  );
     return { source: "mock", forecast: getMockWeather(days) };
   }
 }
