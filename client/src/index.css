@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-mist text-spruce-900 font-body antialiased;
+}
+
+::selection {
+  @apply bg-amber/30;
+}
+
+/* Visible keyboard focus everywhere */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #e8a33d;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Ridgeline signature motif: a thin mountain-outline rule used to divide
+   sections and to draw the itinerary's day "path". */
+.ridge-divider {
+  height: 28px;
+  width: 100%;
+  background-repeat: repeat-x;
+  background-size: 120px 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='28' viewBox='0 0 120 28'%3E%3Cpath d='M0 24 L18 8 L30 18 L46 4 L62 20 L78 10 L92 22 L120 6' fill='none' stroke='%231E4238' stroke-width='1.5' stroke-opacity='0.35'/%3E%3C/svg%3E");
+}
+
+.font-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.input {
+  @apply w-full rounded-lg border border-spruce-100 bg-mist-50 px-3.5 py-2.5 text-spruce-900 placeholder:text-spruce-200 focus:bg-white focus:border-spruce-400 outline-none transition-colors;
+}
