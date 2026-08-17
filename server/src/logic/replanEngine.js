@@ -16,7 +16,7 @@ import {
  *   "weather" | "closure" | "travel-time" | "budget" | "add-place" | "delay" | "auto"
  * "auto" runs every rule in a sensible order (used for a general "re-check" button).
  */
-export function replanItinerary({ itineraryDays, places, weatherForecast, people, budget, trigger }) {
+export async function replanItinerary({ itineraryDays, places, weatherForecast, people, budget, trigger }) {
   const usedIds = new Set(
     itineraryDays.flatMap((d) => d.stops.map((s) => s.id))
   );
@@ -30,12 +30,11 @@ export function replanItinerary({ itineraryDays, places, weatherForecast, people
   let budgetSummary = null;
 
   for (const rule of pipeline) {
-    const result = rule(current, context);
-    current = result.itineraryDays;
-    if (result.changes?.length) allChanges.push(...result.changes);
-    if (result.budgetSummary) budgetSummary = result.budgetSummary;
-  }
-
+  const result = await rule(current, context);
+  current = result.itineraryDays;
+  if (result.changes?.length) allChanges.push(...result.changes);
+  if (result.budgetSummary) budgetSummary = result.budgetSummary;
+}
   return {
     original: itineraryDays,
     updated: current,

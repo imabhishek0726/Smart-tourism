@@ -1,6 +1,7 @@
 import { haversineKm } from "../utils/distance.js";
 import { addMinutes, isOpenDuring, MAX_ACCEPTABLE_TRAVEL_MINUTES } from "../utils/travelTime.js";
 import { calculateBudget, stopCost } from "../utils/budget.js";
+import { getTravelTimeMinutes } from "../services/routingService.js";
 
 const OUTDOOR_UNSAFE_CATEGORIES = ["adventure", "nature"];
 
@@ -101,38 +102,53 @@ export function applyOpeningHoursRule(itineraryDays) {
   return { changed: changes.length > 0, itineraryDays: updated, changes };
 }
 
-export function applyTravelTimeRule(itineraryDays, context) {
+export async function applyTravelTimeRule(itineraryDays, context) {
   const changes = [];
-  const updated = itineraryDays.map((day) => {
-    if (day.stops.length < 2) return day;
 
-    // detect any consecutive pair exceeding the acceptable travel threshold
-    let hasLongHop = false;
-    for (let i = 0; i < day.stops.length - 1; i++) {
-      const distKm = haversineKm(day.stops[i], day.stops[i + 1]);
-      const estMinutes = Math.round((distKm / 25) * 60); // mountain-road estimate
-      if (estMinutes > MAX_ACCEPTABLE_TRAVEL_MINUTES) {
-        hasLongHop = true;
-        break;
+  const updated = await Promise.all(
+    itineraryDays.map(async (day) => {
+      if (day.stops.length < 2) return day;
+
+      // Check actual travel time between every consecutive pair
+      let hasLongHop = false;
+
+      for (let i = 0; i < day.stops.length - 1; i++) {
+        const from = day.stops[i];
+        const to = day.stops[i + 1];
+
+        const travelMinutes = await getTravelTimeMinutes(
+          from,
+          to
+        );
+
+        if (travelMinutes > MAX_ACCEPTABLE_TRAVEL_MINUTES) {
+          hasLongHop = true;
+          break;
+        }
       }
-    }
-    if (!hasLongHop) return day;
 
-    const reordered = nearestNeighborOrder(day.stops);
-    const rescheduled = resequence(reordered);
+      if (!hasLongHop) return day;
 
-    changes.push({
-      day: day.day,
-      type: "travel-time",
-      reason: `Travel time between stops on Day ${day.day} exceeded ${MAX_ACCEPTABLE_TRAVEL_MINUTES} minutes, so nearby stops were reordered to cut down on backtracking.`,
-      before: day.stops.map((s) => s.name).join(" → "),
-      after: rescheduled.map((s) => s.name).join(" → "),
-    });
+      const reordered = nearestNeighborOrder(day.stops);
+      const rescheduled = resequence(reordered);
 
-    return { ...day, stops: rescheduled };
-  });
+      changes.push({
+        day: day.day,
+        type: "travel-time",
+        reason: `Travel time between stops on Day ${day.day} exceeded ${MAX_ACCEPTABLE_TRAVEL_MINUTES} minutes, so nearby stops were reordered to cut down on backtracking.`,
+        before: day.stops.map((s) => s.name).join(" → "),
+        after: rescheduled.map((s) => s.name).join(" → "),
+      });
 
-  return { changed: changes.length > 0, itineraryDays: updated, changes };
+      return { ...day, stops: rescheduled };
+    })
+  );
+
+  return {
+    changed: changes.length > 0,
+    itineraryDays: updated,
+    changes,
+  };
 }
 
 export function applyBudgetRule(itineraryDays, context) {

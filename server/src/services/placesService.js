@@ -61,6 +61,13 @@ export async function fetchPlaces(destination, interests = []) {
       avgCost: 200,
       avgVisitMinutes: 90,
       rating: 4.0,
+      estimatedFields: [
+  "openHour",
+  "closeHour",
+  "avgCost",
+  "avgVisitMinutes",
+  "rating",
+],
       description: f.properties.address_line2 || "",
     }));
 

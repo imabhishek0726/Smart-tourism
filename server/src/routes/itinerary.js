@@ -5,6 +5,10 @@ import { generateItinerary } from "../logic/itineraryGenerator.js";
 import { replanItinerary } from "../logic/replanEngine.js";
 import { calculateBudget } from "../utils/budget.js";
 
+import {
+  validateGenerateBody,
+  validateReplanBody,
+} from "../utils/validation.js";
 const router = Router();
 
 // POST /api/itinerary/generate
@@ -12,11 +16,14 @@ router.post("/generate", async (req, res) => {
   try {
     const { destination, days, people, budget, interests } = req.body;
 
-    if (!destination || !days || !people || !budget) {
-      return res.status(400).json({
-        error: "destination, days, people and budget are required.",
-      });
-    }
+   const validation = validateGenerateBody(req.body);
+
+if (!validation.valid) {
+  return res.status(400).json({
+    error: "Invalid request body.",
+    details: validation.errors,
+  });
+}
 
     const [placesResult, weatherResult] = await Promise.all([
       fetchPlaces(destination, interests || []),
@@ -54,13 +61,16 @@ router.post("/replan", async (req, res) => {
   try {
     const { itinerary, places, weather, people, budget, trigger } = req.body;
 
-    if (!itinerary || !trigger?.type) {
-      return res.status(400).json({
-        error: "itinerary and trigger.type are required.",
-      });
-    }
+   const validation = validateReplanBody(req.body);
 
-    const result = replanItinerary({
+if (!validation.valid) {
+  return res.status(400).json({
+    error: "Invalid request body.",
+    details: validation.errors,
+  });
+}
+
+    const result = await replanItinerary({
       itineraryDays: itinerary,
       places: places || [],
       weatherForecast: weather || [],
