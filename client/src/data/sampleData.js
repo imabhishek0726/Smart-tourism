@@ -41,12 +41,12 @@ export const sampleGenerateResponse = {
   ],
   budgetSummary: {
     activityCost: 10400,
-    foodCost: 6000,
-    stayCost: 9600,
-    localTravelCost: 900,
-    totalEstimated: 26900,
+    foodCost: 3000,
+    stayCost: 6000,
+    localTravelCost: 600,
+    totalEstimated: 20000,
     totalBudget: 20000,
-    remaining: -6900,
-    exceeded: true,
+    remaining: 0,
+    exceeded: false,
   },
 };

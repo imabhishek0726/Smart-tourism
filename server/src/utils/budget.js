@@ -1,7 +1,9 @@
 /**
  * Computes a budget breakdown for a generated itinerary.
- * activityCost = sum of avgCost * people for every stop
- * Food/stay are rough per-day-per-person estimates for the demo.
+ * activityCost = sum of avgCost * people for every stop.
+ * Food/stay are rough per-day-per-person estimates kept deliberately modest so
+ * the default demo budget stays realistic and does not falsely flag every trip as
+ * over budget.
  */
 export function calculateBudget(itineraryDays, people, totalBudget) {
   let activityCost = 0;
@@ -12,9 +14,9 @@ export function calculateBudget(itineraryDays, people, totalBudget) {
   }
 
   const days = itineraryDays.length;
-  const foodCost = days * people * 500; // ₹500/person/day estimate
-  const stayCost = days * people * 800; // ₹800/person/day estimate
-  const localTravelCost = days * 300; // flat estimate per day
+  const foodCost = days * people * 250; // ₹250/person/day estimate
+  const stayCost = days * people * 500; // ₹500/person/day estimate
+  const localTravelCost = days * 200; // flat estimate per day
 
   const totalEstimated = activityCost + foodCost + stayCost + localTravelCost;
 
