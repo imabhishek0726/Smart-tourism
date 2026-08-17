@@ -190,3 +190,5 @@ to mock data** — the demo never breaks.
   `avgCost`, and `avgVisitMinutes` — this is the shared vocabulary between
   the generator, the rule engine, and the UI, so no field ever needs
   re-deriving on the frontend.
+#   I E M S - - s m a r t - v e h i c l e -  
+ 
